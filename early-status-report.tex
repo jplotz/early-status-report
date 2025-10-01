@@ -56,7 +56,7 @@ A more feasible solution would be to host the site and add an extremely restrict
 \subsection{Technical Debt and Maintainability}
 While we may assume one identity controls all containers, it may still be smarter in the long run to design for the possibility of multiple concurrent users, even if this isn't made possible by our hosting configuration.
 
-Since "make it support multiple users" is an excellent goal if this project returns to Senior Design, we will design for the possibility of this extension by programatically tracking container IDs and associating them with the user's identity and actions. This design decision also makes it easier for us to manage state and tell the user "You cannot stop a container you haven't deployed!" even in the single-user version of WADT.
+Since "make it support multiple users" is an excellent goal if this project returns to Senior Design, we will design for the possibility of this extension by programmatically tracking container IDs and associating them with the user's identity and actions. This design decision also makes it easier for us to manage state and tell the user "You cannot stop a container you haven't deployed!" even in the single-user version of WADT.
 
 As a stretch goal, future teams that work on this project would be able to extend our API instead of rewriting it.
 
