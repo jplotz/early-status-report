@@ -1,0 +1,86 @@
+\documentclass[12pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+
+
+\title{Early Status Report}
+\author{
+	Dustin Allen
+	\and
+	Daniel Armas
+	\and
+	Rithik Dhakshnamoorthy
+	\and
+	Jacob Plotz
+	\and
+	Luke Samuel Sandoval
+	\and
+	Jereme Saunders
+}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Minimum Viable Product}
+
+\subsection{The Setup Timesink Problem}
+Cybersecurity students want to practice exploiting and patching vulnerable webapps. When they sit down to practice, their time is eaten up by installation and setup before they can start hacking.
+
+Cybersecurity instructors want to provide labs for their students. These labs require research, setup, installation, and testing. The instructor must take the time to guide each student through the same prerequisite steps before the real learning can begin.
+
+Both parties are capable of following a list of instructions to set up a target webapp. These skills are not the desired target of practice. However, requiring setup work on a per-lab basis means wasting learning time.
+
+\subsection{How our MVP Solves the Setup Timesink Problem}
+The Web App Deployment Tooling (WADT) project allows students and instructors to browse a catalog of ready-to-deploy vulnerable webapps and manage them through a graphical interface. WADT is the first step in the learning pipeline that ensures students and instructors are on the same page in minimal time. Their efforts can shift to investigating the app itself, while the container-based architecture of WADT ensures they have reproducible sandboxed builds available at the click of a button.
+
+\subsection{Scope Limitations}
+WADT is intended to be used in an instructional setting as part of a lab. While all code developed for the project is free and open-source, the site and the AWS instance it runs on are not accessible to the general public. The team members and sponsor are the only individuals expected to access the site and instance while it is in early development.
+
+Later in development, our users will access both the WADT site and the instance through their instructor similar to how we have accessed these two resources. We expect that users (assisted by instructors) are capable of reproducing our instructions for accessing the instance and authenticating to access the site when we provide these documents.
+
+The current scope of WADT does not provision for multiple concurrent users at a time with containers managed on a per-identity basis. Each container may be associated with one and the same identity, under the assumption that students will actively collaborate and share management of the containers.
+
+\subsection{Hosting and Security}
+Hosting vulnerable applications on a public, internet-facing server is considered a bad practice. Special precautions must be taken to ensure that malicious actors cannot compromise the instance through a vulnerable container, and that the containers themselves are not compromised and used for criminal purposes.
+
+A viable solution may be to avoid hosting the site at all. It is technically possible for the site to be kept local-only and require each student to download and run the project from their own machine. However, this would largely defeat the purpose of the project as it would require its own setup and installation steps.
+
+Another option may be to install and configure the project local-only on the AWS instance but avoid exposing the instance to the public internet. Each student would be required to connect to the instance through a VPN. The preceding two solutions are dead simple to the point of being below the level of sophistication expected of a 9-month project.
+
+A more feasible solution would be to host the site and add an extremely restrictive security configuration. The instance could be configured to only accept incoming traffic from and send outgoing traffic to a small number of IPs or an IP range explicitly listed in a whitelist. This solution is ideal if the machines used in the lab have IP addresses that fall within a specific range or are unlikely to change over a semester-long course. Under this scheme, the target webapp containers would be blocked from making requests to third parties. Discretion would be left up entirely to the students (a rogue student would have the ability to change the whitelist).
+
+\subsection{Technical Debt and Maintainability}
+While we may assume one identity controls all containers, it may still be smarter in the long run to design for the possibility of multiple concurrent users, even if this isn't made possible by our hosting configuration.
+
+Since "make it support multiple users" is an excellent goal if this project returns to Senior Design, we will design for the possibility of this extension by programatically tracking container IDs and associating them with the user's identity and actions. This design decision also makes it easier for us to manage state and tell the user "You cannot stop a container you haven't deployed!" even in the single-user version of WADT.
+
+As a stretch goal, future teams that work on this project would be able to extend our API instead of rewriting it.
+
+\subsection{"Do One Thing Well"}
+WADT is a stage in a learning pipeline. Pipelines are made possible by small, focused applications that do one thing well and rely on standard interfaces. WADT is an abstraction for managing containers. It is not an abstraction over the process of finding API endpoints, making requests, patching, and testing. Therefore, WADT should use conventional input and output formats and get out of the way of the user's preferred tools.
+
+If all the user needs is a URL, provide the URL in an easy-to-copy format. Nothing else.
+
+\subsection{Definition of Done}
+\begin{itemize}
+	\item At least 7 target vulnerable webapps are listed on the site with icons, names, and descriptions. An image for each webapp has been created and tested for reliability (always deploys when required) and reproducibility (application source code and initial state are immutable and consistent). Each target app passes automated tests ensuring that the desired vulnerable endpoints are confirmed reachable.
+	\item Container limits. Each container is alloted a specific amount of compute resources and network bandwidth. Each container is only kept running for a maximum of 24 hours from the last user interaction, at which point it will be automatically downed.
+	\item Status indicator. Each webapp indicates its state. State indication matches actual container behavior (does not indicate stop when container with specified ID is still running, etc.).
+	\item Deploy feature. Users can deploy any of the target webapps. Deploy is accompanied by connection information, assisting users in making requests to the vulnerable application.
+	\item Stop feature. Users can stop any webapp. Stop only functions for containers which are currently running.
+	\item Restart feature. Users can restart each webapp. "Restart" in this context means stop the webapp the student has been working on patching and start it again.
+	\item Reset feature. "Reset" means to stop the version of the app the student has been working on, and deploy the original image before any modifications were made.
+	\item Instructor controls. Site admins can view logs with the status of each container. Each deploy, stop, and restart action is logged. Admins have the option of deploy, stop, and restart, and their actions override the wishes of users (while preventing race conditions and state inconsistency). Instructors have the option to "disable" a container, meaning that the container leaves control of the students and only the instructors can manage it. When a container is disabled, students are unable to make any state changes to the container.
+	\item Student-facing logging. Student-facing logs must provide a window into the container's behavior, without burdening the student with unnecessary Docker-specific details. For students, no single action in the UI should require scrolling the view of the logs (everything resulting from one action should fit on one view). All major interactions through the UI should be logged with timestamps. The logger must preserve history from the moment the container is started to the moment it is manually downed or auto-downed after 24 hours. In the event of an error resulting from a failed attempt to patch a vulnerability, the student must receive the full error message.
+	\item Instructor-facing logging. Must show timestamped logs of all actions taken through the UI by students. Must show container status changes. Uptime for each container must be available to instructors.
+	\item (stretch goal) Instructor-facing controls to add new containers. The admin interface provides a method to upload a custom Dockerfile and add that image to the catalog.
+	\item (stretch goal) Automatic patch checking. User communicates which API endpoints they wish to patch, and the site automatically checks periodically if that endpoint is still vulnerable.
+	\item (stretch goal) UI allows editing of network settings per-container.
+\end{itemize}
+
+
+\end{document}
