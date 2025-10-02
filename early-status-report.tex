@@ -87,23 +87,31 @@ If all the user needs is a URL, provide the URL in an easy-to-copy format. Nothi
 	\item Instructor controls. Site admins can view logs with the status of each container. Each deploy, stop, and restart action is logged. Admins have the option of deploy, stop, and restart, and their actions override the wishes of users (while preventing race conditions and state inconsistency). Instructors have the option to "disable" a container, meaning that the container leaves control of the students and only the instructors can manage it. When a container is disabled, students are unable to make any state changes to the container.
 	\item Student-facing logging. Student-facing logs must provide a window into the container's behavior, without burdening the student with unnecessary Docker-specific details. For students, no single action in the UI should require scrolling the view of the logs (everything resulting from one action should fit on one view). All major interactions through the UI should be logged with timestamps. The logger must preserve history from the moment the container is started to the moment it is manually downed or auto-downed after 24 hours. In the event of an error resulting from a failed attempt to patch a vulnerability, the student must receive the full error message.
 	\item Instructor-facing logging. Must show timestamped logs of all actions taken through the UI by students. Must show container status changes. Uptime for each container must be available to instructors.
-	\item (stretch goal) Instructor-facing controls to add new containers. The admin interface provides a method to upload a custom Dockerfile and add that image to the catalog.
-	\item (stretch goal) Automatic patch checking. User communicates which API endpoints they wish to patch, and the site automatically checks periodically if that endpoint is still vulnerable.
-	\item (stretch goal) UI allows editing of network settings per-container.
+\end{itemize}
+
+\subsection{Stretch Goals}
+\begin{itemize}
+	\item (stretch goal) Instructor-facing controls to add new containers. The admin interface provides a method to upload a custom Dockerfile and add that image to the catalog. Instructors will be able to add container metadata (name, description, tags, category, etc.). This new container will function identically to the containers built-in to the site.
+	\item (stretch goal) Automatic patch checking. User communicates which API endpoints they wish to patch, and the site automatically checks periodically if that endpoint is still vulnerable. Status reports are generated showing which of a set of endpoints are still reachable at the time the report is generated.
+	\item (stretch goal) UI allows editing of network settings per-container. Users can customize port number on a per-container basis through the UI.
+	\item (stretch goal) System resource usage display. Admin UI displays, in addition to container uptime, CPU, memory, and network usage for each container.
+	\item (stretch goal) Custom colorschemes.
+	      Make site compatible with widely used color scheme file formats (minimum: .Xresources, .itermcolors, Windows settings.json, and .yml used for GNOME terminal and xfce4 terminal). Students will be able to use the same colors for WADT and for their terminal.
+	\item (stretch goal) Custom interactions window. Users can issue (arbitrary) commands to the container through the site. Users may edit files with a text editor through the site. This stretch goal is extremely ambitious. The security vulnerabilities potentially resulting from exposing a shell to a container are numerous and severe. Additionally, embedding a full terminal emulator inside of a webapp is a difficult task.
 \end{itemize}
 
 \section{Sprint Backlog}
 \subsection{Sprint 1 (Weeks 1-3)}
 \begin{itemize}
-	\item Setup Database: 
-	Select the database for the project. Create a schema or model of the data. Project scope is one user at a time, limited enough to allow for not putting much thought into the database. However, an approach that at least allows for the possibility of multiple users eliminates technical debt which may haunt future SD teams.
+	\item Setup Database:
+	      Select the database for the project. Create a schema or model of the data. Project scope is one user at a time, limited enough to allow for not putting much thought into the database. However, an approach that at least allows for the possibility of multiple users eliminates technical debt which may haunt future SD teams.
 	\item Determine Essential Interactions:
-	Answer the question: what do our users want to do with Docker containers? The answer determines which API endpoints the backend must expose and which controls the UI team must anticipate.
+	      Answer the question: what do our users want to do with Docker containers? The answer determines which API endpoints the backend must expose and which controls the UI team must anticipate.
 	\item Create UI Mockups:
-	Create mockups/wireframes for the UI components of each page.
+	      Create mockups/wireframes for the UI components of each page.
 	\item Security Audit:
-	The entire team verifies the security practices used to set up the AWS instance. Each member documents potential issues with the setup.
+	      The entire team verifies the security practices used to set up the AWS instance. Each member documents potential issues with the setup.
 	\item Select and Dockerize 7 Vulnerable Apps:
-	Select and containerize 7 appropriate vulnerable apps
+	      Select and containerize 7 appropriate vulnerable apps
 \end{itemize}
 \end{document}
